@@ -1,64 +1,84 @@
 <?php
-// Database connection (replace with your credentials)
-require('header.php');
-require_once('db_connection.php');
 
-// Check if user ID is provided
-if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-    $user_id = $_GET['id'];
+include("header.php");
 
-    // Retrieve user information
-    $sql = "SELECT * FROM users WHERE id = $user_id";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows == 1) {
-        $row = $result->fetch_assoc();
-        $username = $row['username'];
-        $email = $row['email'];
-    } else {
-        echo "User not found.";
-        exit();
-    }
-} else {
-    echo "Invalid user ID.";
+//session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php");
     exit();
 }
 
-// Handle form submission for updating user information
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $new_username = $_POST['new_username'];
-    $new_email = $_POST['new_email'];
+// Load user data
+$userData = file_get_contents('users.txt');
+$users = json_decode($userData, true);
 
-    // Update user information in the database
-    $sql = "UPDATE users SET username='$new_username', email='$new_email' WHERE id = $user_id";
+// Retrieve the email from the form
+$email = $_POST['email'];
 
-    if ($conn->query($sql) === TRUE) {
-        echo "User information updated successfully.";
-        // Optionally, you can redirect to a different page after successful update
-        header("Location: user.php");
-        exit();
-    } else {
-        echo "Error updating user information: " . $conn->error;
+// Find the user with the matching email
+$userKey = null;
+foreach ($users as $key => $user) {
+    if ($user['email'] === $email) {
+        $userKey = $key;
+        break;
     }
 }
 
-$conn->close();
+if ($userKey === null) {
+    header("Location: role_management.php");
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $newUsername = isset($_POST['newUsername']) ? $_POST['newUsername'] : '';
+    $newEmail = isset($_POST['newEmail']) ? $_POST['newEmail'] : '';
+    $newRole = isset($_POST['newRole']) ? $_POST['newRole'] : '';
+
+    if (!empty($newUsername) && !empty($newEmail) && !empty($newRole)) {
+        $users[$userKey]['username'] = $newUsername;
+        $users[$userKey]['email'] = $newEmail;
+        $users[$userKey]['role'] = $newRole;
+
+        // Save updated user data
+        file_put_contents('users.txt', json_encode($users));
+        header("Location: role_management.php");
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Edit User</title>
+    <meta charset="UTF-8">
+    <title>Edit User Information</title>
 </head>
 
 <body>
-    <h2>Edit User</h2>
-    <form method="post" action="">
-        New Username: <input type="text" name="new_username" value="<?php echo $username; ?>"><br>
-        New Email: <input type="email" name="new_email" value="<?php echo $email; ?>"><br>
-        <input type="submit" value="Update">
-    </form>
+    <div class="container m-5">
+        <h1>Edit User Information</h1>
+        <form action="edit_user.php" method="post">
+            <input type="hidden" name="email" value="<?php echo $users[$userKey]['email']; ?>">
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Username</label>
+                <input type="text" name="newUsername" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp" value="<?php echo $users[$userKey]['username']; ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                <input type="email" name="newEmail" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp" value="<?php echo $users[$userKey]['email']; ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Role</label>
+                <input type="text" name="newRole" class="form-control" id="exampleInputPassword1"
+                    value="<?php echo $users[$userKey]['role']; ?>" readonly required>
+            </div>
+
+            <button type="submit" value="Save Changes" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
 </body>
 
 </html>
