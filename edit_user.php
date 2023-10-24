@@ -65,15 +65,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" name="newUsername" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp" value="<?php echo $users[$userKey]['username']; ?>" required>
             </div>
+
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Email address</label>
                 <input type="email" name="newEmail" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp" value="<?php echo $users[$userKey]['email']; ?>" required>
             </div>
-            <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Role</label>
-                <input type="text" name="newRole" class="form-control" id="exampleInputPassword1"
-                    value="<?php echo $users[$userKey]['role']; ?>" readonly required>
+
+            <label class="form-label" for="inputGroupSelect01">Role</label>
+            <div class="input-group mb-3">
+                <select class="form-select" id="inputGroupSelect01" name="newRole">
+                    <?php
+                    $options = array("admin", "agent", "user");
+
+                    foreach ($options as $value) {
+                        $selected = ($value == $users[$userKey]['role']) ? "selected" : "";
+                        echo "<option value='$value' $selected>$value</option>";
+                    }
+                    ?>
+                </select>
             </div>
 
             <button type="submit" value="Save Changes" class="btn btn-primary">Submit</button>

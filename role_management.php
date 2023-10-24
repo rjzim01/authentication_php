@@ -57,7 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h4>Available users...</h4>
         <a href="add_user.php" class="btn btn-success mt-3 mb-3">Add User</a>
 
-        <table class="table table-success table-striped table-bordered">
+
+        <!-- ----------------Table--------------- -->
+
+        <table class="table table-success table-bordered">
             <tr>
                 <th>Email</th>
                 <th>Username</th>
@@ -65,23 +68,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <th colspan="2">Action</th>
             </tr>
             <?php foreach ($users as $user): ?>
+
                 <tr>
-                    <td>
+                    <td
+                        class="<?php echo ($user['role'] == 'admin') ? 'bg-success' : (($user['role'] == 'agent') ? 'bg-warning' : ''); ?>">
                         <?php echo $user['email']; ?>
                     </td>
-                    <td>
+                    <td
+                        class="<?php echo ($user['role'] == 'admin') ? 'bg-success' : (($user['role'] == 'agent') ? 'bg-warning' : ''); ?>">
                         <?php echo $user['username']; ?>
                     </td>
-                    <td>
+                    <td
+                        class="<?php echo ($user['role'] == 'admin') ? 'bg-success' : (($user['role'] == 'agent') ? 'bg-warning' : ''); ?>">
                         <?php echo $user['role']; ?>
                     </td>
-                    <td>
+                    <td
+                        class="<?php echo ($user['role'] == 'admin') ? 'bg-success' : (($user['role'] == 'agent') ? 'bg-warning' : ''); ?>">
                         <form action="edit_user.php" method="post">
                             <input type="hidden" name="email" value="<?php echo $user['email']; ?>">
                             <input type="submit" value="Edit" class="btn btn-info">
                         </form>
                     </td>
-                    <td>
+                    <td
+                        class="<?php echo ($user['role'] == 'admin') ? 'bg-success' : (($user['role'] == 'agent') ? 'bg-warning' : ''); ?>">
                         <form action="role_management.php" method="post">
                             <input type="hidden" name="action" value="deleteUser">
                             <input type="hidden" name="email" value="<?php echo $user['email']; ?>">
@@ -89,14 +98,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </form>
                     </td>
                 </tr>
+
+
             <?php endforeach; ?>
         </table>
+        <!-- ---------------- -->
     </div>
-    <!-- 
-    <form action="functions.php" method="post">
-        <input type="hidden" name="action" value="logout">
-        <input type="submit" value="Logout">
-    </form> -->
+
 </body>
 
 </html>

@@ -30,15 +30,19 @@ function login($email, $password)
             $_SESSION['email'] = $email;
             $_SESSION['role'] = $user['role'];
 
-            // // Redirect based on role
-            // if ($user['role'] === 'admin') {
-            //     header("Location: role_management.php");
-            // } else {
-            //     // Redirect to user dashboard or any other page
-            //     header("Location: user_dashboard.php");
-            // }
+            // Redirect based on role
+            if ($user['role'] === 'admin') {
+                //admin
+                header("Location: role_management.php");
+            } else if ($user['role'] === 'agent') {
+                // Redirect to user dashboard or any other page
+                header("Location: agent.php");
+            } else {
+                // Redirect to user dashboard or any other page
+                header("Location: user_dashboard.php");
+            }
 
-            header("Location: index.php");
+            //header("Location: index.php");
 
             exit();
         }
